@@ -17,9 +17,20 @@ int sensorPin=A0;
 int tempPin = A4;
 int val=0;
 
+int kp=50,kd=18,ki=1;
+
+int temperature_read=0;
+int set_temperature=0;
+
+int PID_error=0;
+
+float previous_error = 0;
+float PID_p=0,PID_d=0,PID_i=0,PID_value=0;
+float elapsedTime, Time, timePrev;
+
 void setup() 
 {
-
+            Time = millis(); 
             // Timer Setup for High Frequency PWM
            
             pinMode(3, OUTPUT);
@@ -27,7 +38,7 @@ void setup()
             TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20);  
             TCCR2B = _BV(CS20);
             //OCR2A = 127;
-            OCR2B = 127;
+            OCR2B = 0;
             
             Serial.begin(9600);
 
@@ -64,13 +75,44 @@ void loop()
   lcd.print((int)DHT.temperature);
   lcd.setCursor(15,1);
   lcd.print("C");
- 
-  OCR2B = (potchange/1024)*255 ;
+
   
-  Serial.println(" LM 35 Temp  ");
-  Serial.println((int)(cel));
-  Serial.println(" DHT Temp  ");
+  
+  //OCR2B = (potchange/1024)*255 ;
+  
+//  Serial.println(" LM 35 Temp  ");
+//  Serial.println((int)(cel));
+  Serial.println(" Actual Temperature  ");
   Serial.println(DHT.temperature);  
+  Serial.println(" Set Temperature ");
+  Serial.println(temp1);
+  
+  set_temperature=temp1;
+  temperature_read= DHT.temperature;
+  PID_error = abs(set_temperature - temperature_read) ;
+  Serial.println("PID Error");
+  Serial.println(PID_error);
+  PID_p = kp * PID_error;
+  
+  PID_i = 0.01*PID_i + (ki * PID_error);
+  
+  timePrev = Time;                            
+  Time = millis();                            
+  elapsedTime = (Time - timePrev) / 1000; 
+  PID_d = kd*((PID_error - previous_error)/elapsedTime);
+
+  PID_value = PID_p + PID_d + PID_i ;
+
+   if(PID_value < 0)
+    {    PID_value = 0;    }
+  if(PID_value > 255)  
+    {    PID_value = 255;  }
+  
+  OCR2B=PID_value;
+  previous_error = PID_error; 
+  
+  Serial.println("PWM Value ");
+  Serial.println(PID_value);
   delay(1500);
 }
 
