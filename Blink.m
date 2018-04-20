@@ -1,7 +1,7 @@
-clear
-clc
 
-s = serial('COM3');
+ClearCom
+s = serial('COM3','BaudRate', 9600);
+set(s,'Timeout',120); 
 time=2000;
 i=1;
 x_time=[0:1.5:150];
@@ -36,9 +36,10 @@ while(i<time)
     grid
     
     
-    fclose(s)
+   
     i=i+1;
     drawnow;
 end
+fclose(s)
 delete(s)
 clear s
