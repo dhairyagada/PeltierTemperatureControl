@@ -1,7 +1,7 @@
 % Copyright 2014 The MathWorks, Inc.
 ClearCom
 %% Create serial object for Arduino
-s = serial('COM3'); % change the COM Port number as needed
+s = serial('COM6'); % change the COM Port number as needed
 set(s,'Timeout',120); 
 %% Connect the serial port to Arduino
 %%s.InputBufferSize = 2; % read only one byte every time
@@ -12,7 +12,7 @@ catch err
     error('Make sure you select the correct COM Port where the Arduino is connected.');
 end
 %% Create a figure window to monitor the live data
-Tmax = 300; % Total time for data collection (s)
+Tmax = 90; % Total time for data collection (s)
 figure,
 grid on,
 xlabel ('Time (s)'), ylabel('Data (8-bit)'),
@@ -23,6 +23,7 @@ i = 0;
 data = 0;
 t = 0;
 tic % Start timer
+
 while toc <= Tmax
     i = i + 1;
     %% Read buffer data
@@ -51,22 +52,23 @@ while toc <= Tmax
 
     subplot(211);
     plot(DHTemp,'g');
-    set(gca,'XTick',[0:1.5:150])
-    axis([0,150,10,65]);
+    set(gca,'XTick',[0:1:60])
+    axis([0,60,10,65]);
     title('DHT11 Temperature');
-    xlabel('Time');
+    xlabel('Sample n   time=1.5 x n');
     ylabel('Temperature');
     grid
-    
-    
+
+
     subplot(212);
     plot(SETemp,'m');
-    set(gca,'XTick',[0:1.5:150])
-    axis([0,150,10,65]);
+    set(gca,'XTick',[0:1:60])
+    axis([0,60,10,65]);
     title('Set Temperature');
-    xlabel('Time');
+    xlabel('Sample n   time=1.5 x n');
     ylabel('Temperature ');
     grid
     drawnow;
 end
+
 fclose(s);
