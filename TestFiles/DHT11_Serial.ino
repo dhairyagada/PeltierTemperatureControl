@@ -2,14 +2,15 @@
 dht DHT;
 #define DHT11_PIN 7
 
-int RoomTemp=0;
-
 void setup()
 {
-    Serial.begin(9600);
+  Serial.begin(9600);
 }
+
 void loop()
 {
-    Serial.println((int)DHT.temperature); 
-    delay(1200);
+  int chk = DHT.read11(DHT11_PIN);
+  Serial.print("Temperature = ");
+  Serial.println(DHT.temperature);
+  delay(2000);
 }
